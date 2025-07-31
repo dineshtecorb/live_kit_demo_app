@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:live_kit_demo/livekit_screen.dart';
+import 'package:provider/provider.dart';
+import 'livekit_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => LiveKitProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,7 +23,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Container(),
+      debugShowCheckedModeBanner: false,
+      home: const LiveKitHomePage(),
     );
   }
 }
