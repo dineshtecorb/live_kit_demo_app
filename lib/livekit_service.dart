@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:http/http.dart' as http;
 
 class LiveKitService {
   Room? _room;
@@ -32,4 +35,25 @@ class LiveKitService {
   }
 
   // Add more methods for publishing, subscribing, muting, etc. as needed
+  Future<dynamic> generateTokenAndUrlWith(
+      String paticipantName, String roomName) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://cloud-api.livekit.io/api/sandbox/connection-details'),
+        headers: {
+          'X-Sandbox-ID': 'tecorblivekitserver-1xky67',
+        },
+        body: {
+          'participantName': paticipantName,
+          'roomName': roomName,
+        },
+      );
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error generating token and url: $e');
+      }
+    }
+  }
 }
