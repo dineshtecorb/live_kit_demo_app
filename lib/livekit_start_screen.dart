@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:live_kit_demo/livekit_provider.dart';
+import 'package:live_kit_demo/livekit_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -15,30 +16,46 @@ class _LiveKitStartScreenState extends State<LiveKitStartScreen> {
   final _roomNameController = TextEditingController();
 
   Future<void> _checkPermissions() async {
-    var status = await Permission.bluetooth.request();
-    if (status.isPermanentlyDenied) {
+    // Check microphone permission (required for audio)
+    var micStatus = await Permission.microphone.request();
+    if (micStatus.isPermanentlyDenied) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Bluetooth Permission disabled'),
+          content: Text('Microphone permission is required for audio calls'),
+          backgroundColor: Colors.red,
         ),
       );
-      print('Bluetooth Permission disabled');
+      print('Microphone permission denied');
     }
-    status = await Permission.bluetoothConnect.request();
-    if (status.isPermanentlyDenied) {
+
+    // Check camera permission (optional for video)
+    var cameraStatus = await Permission.camera.request();
+    if (cameraStatus.isPermanentlyDenied) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Bluetooth Connect Permission disabled'),
+          content: Text('Camera permission is required for video calls'),
+          backgroundColor: Colors.orange,
         ),
       );
-      print('Bluetooth Connect Permission disabled');
+      print('Camera permission denied');
+    }
+
+    // Check bluetooth permissions (optional)
+    var bluetoothStatus = await Permission.bluetooth.request();
+    if (bluetoothStatus.isPermanentlyDenied) {
+      print('Bluetooth permission denied');
+    }
+
+    var bluetoothConnectStatus = await Permission.bluetoothConnect.request();
+    if (bluetoothConnectStatus.isPermanentlyDenied) {
+      print('Bluetooth connect permission denied');
     }
   }
 
   @override
   void initState() {
     super.initState();
-    // _checkPermissions();
+    _checkPermissions();
   }
 
   @override
@@ -61,6 +78,10 @@ class _LiveKitStartScreenState extends State<LiveKitStartScreen> {
             ),
             ElevatedButton(
               onPressed: () {
+                /*Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const LiveKitHomePage()));*/
                 if (_participantNameController.text.isEmpty ||
                     _roomNameController.text.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(

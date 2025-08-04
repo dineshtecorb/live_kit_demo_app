@@ -18,6 +18,29 @@ class _LiveKitHomePageState extends State<LiveKitHomePage> {
   List<Participant> _remoteParticipants = [];
 
   @override
+  void initState() {
+    super.initState();
+    // Audio state will be managed through the UI controls
+  }
+
+  @override
+  void dispose() {
+    _urlController.dispose();
+    _tokenController.dispose();
+    // Ensure cleanup when widget is disposed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<LiveKitProvider>(context, listen: false);
+      if (provider.connected) {
+        provider.disconnect().catchError((e) {
+          // Log error but don't show UI since widget is being disposed
+          print('Error during dispose cleanup: $e');
+        });
+      }
+    });
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<LiveKitProvider>(context);
     return Scaffold(
@@ -129,25 +152,100 @@ class _LiveKitHomePageState extends State<LiveKitHomePage> {
                 ElevatedButton.icon(
                   onPressed: () async {
                     if (provider.room?.localParticipant != null) {
-                      LocalTrackPublication? track = await provider
-                          .room!.localParticipant!
-                          .setMicrophoneEnabled(!_isAudioEnabled);
-                      print("track object ${track?.participant.name}");
-                      print('Room is ${provider.room?.participants.entries}');
-                      setState(() {
-                        _isAudioEnabled = !_isAudioEnabled;
-                      });
+                      try {
+                        await provider.room!.localParticipant!
+                            .setMicrophoneEnabled(!_isAudioEnabled);
+                        setState(() {
+                          _isAudioEnabled = !_isAudioEnabled;
+                        });
+
+                        // Show feedback to user
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(_isAudioEnabled
+                                  ? 'Microphone enabled'
+                                  : 'Microphone disabled'),
+                              backgroundColor: _isAudioEnabled
+                                  ? Colors.green
+                                  : Colors.orange,
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error toggling microphone: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    } else {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Not connected to room'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   },
                   icon: Icon(_isAudioEnabled ? Icons.mic : Icons.mic_off),
                   label: Text(_isAudioEnabled ? 'Mute' : 'Unmute'),
                 ),
                 ElevatedButton.icon(
-                  onPressed: provider.disconnect,
+                  onPressed: () async {
+                    try {
+                      await provider.disconnect();
+                      // Optionally navigate back or show success message
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Successfully disconnected'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error disconnecting: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
                   icon: const Icon(Icons.call_end),
                   label: const Text('End Call'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // Print debug info
+                    provider.printDebugInfo();
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Debug info printed to console'),
+                          backgroundColor: Colors.blue,
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.bug_report),
+                  label: const Text('Debug'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
                 ),

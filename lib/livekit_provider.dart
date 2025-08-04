@@ -23,13 +23,15 @@ class LiveKitProvider extends ChangeNotifier {
       BuildContext context, String paticipantName, String roomName) async {
     final response =
         await _service.generateTokenAndUrlWith(paticipantName, roomName);
+
     if (response != null &&
         response['serverUrl'] != null &&
         response['participantToken'] != null) {
+      if (await _service.isRoomActive(response['roomName'])) {}
       _url = response['serverUrl'];
       _token = response['participantToken'];
-      _paticipantName = paticipantName;
-      _roomName = roomName;
+      _paticipantName = response['participantName'];
+      _roomName = response['roomName'];
       print(
           "url is $_url and token is $_token also name $_roomName and $_paticipantName");
       Navigator.push(
@@ -42,14 +44,31 @@ class LiveKitProvider extends ChangeNotifier {
   }
 
   Future<void> connect(String url, String token) async {
-    await _service.connect(url, token);
-    _connected = true;
-    notifyListeners();
+    try {
+      await _service.connect(url, token);
+      _connected = true;
+      notifyListeners();
+    } catch (e) {
+      _connected = false;
+      notifyListeners();
+      //rethrow;
+    }
   }
 
-  void disconnect() {
-    _service.disconnect();
-    _connected = false;
-    notifyListeners();
+  Future<void> disconnect() async {
+    try {
+      await _service.disconnect();
+      _connected = false;
+      notifyListeners();
+    } catch (e) {
+      // Even if disconnect fails, mark as disconnected
+      _connected = false;
+      notifyListeners();
+      // rethrow;
+    }
+  }
+
+  void printDebugInfo() {
+    _service.printAudioDebugInfo();
   }
 }
