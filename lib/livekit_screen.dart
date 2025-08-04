@@ -107,46 +107,52 @@ class _LiveKitHomePageState extends State<LiveKitHomePage> {
         ),
         Container(
           padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () async {
-                  if (provider.room?.localParticipant != null) {
-                    await provider.room!.localParticipant!
-                        .setCameraEnabled(!_isVideoEnabled);
-                    setState(() {
-                      _isVideoEnabled = !_isVideoEnabled;
-                    });
-                  }
-                },
-                icon:
-                    Icon(_isVideoEnabled ? Icons.videocam : Icons.videocam_off),
-                label: Text(_isVideoEnabled ? 'Stop Video' : 'Start Video'),
-              ),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  if (provider.room?.localParticipant != null) {
-                    await provider.room!.localParticipant!
-                        .setMicrophoneEnabled(!_isAudioEnabled);
-                    setState(() {
-                      _isAudioEnabled = !_isAudioEnabled;
-                    });
-                  }
-                },
-                icon: Icon(_isAudioEnabled ? Icons.mic : Icons.mic_off),
-                label: Text(_isAudioEnabled ? 'Mute' : 'Unmute'),
-              ),
-              ElevatedButton.icon(
-                onPressed: provider.disconnect,
-                icon: const Icon(Icons.call_end),
-                label: const Text('End Call'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    if (provider.room?.localParticipant != null) {
+                      await provider.room!.localParticipant!
+                          .setCameraEnabled(!_isVideoEnabled);
+                      setState(() {
+                        _isVideoEnabled = !_isVideoEnabled;
+                      });
+                    }
+                  },
+                  icon: Icon(
+                      _isVideoEnabled ? Icons.videocam : Icons.videocam_off),
+                  label: Text(_isVideoEnabled ? 'Stop Video' : 'Start Video'),
                 ),
-              ),
-            ],
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    if (provider.room?.localParticipant != null) {
+                      LocalTrackPublication? track = await provider
+                          .room!.localParticipant!
+                          .setMicrophoneEnabled(!_isAudioEnabled);
+                      print("track object ${track?.participant.name}");
+                      print('Room is ${provider.room?.participants.entries}');
+                      setState(() {
+                        _isAudioEnabled = !_isAudioEnabled;
+                      });
+                    }
+                  },
+                  icon: Icon(_isAudioEnabled ? Icons.mic : Icons.mic_off),
+                  label: Text(_isAudioEnabled ? 'Mute' : 'Unmute'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: provider.disconnect,
+                  icon: const Icon(Icons.call_end),
+                  label: const Text('End Call'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],

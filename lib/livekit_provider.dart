@@ -30,6 +30,8 @@ class LiveKitProvider extends ChangeNotifier {
       _token = response['participantToken'];
       _paticipantName = paticipantName;
       _roomName = roomName;
+      print(
+          "url is $_url and token is $_token also name $_roomName and $_paticipantName");
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const LiveKitHomePage()),
