@@ -27,7 +27,7 @@ class LiveKitProvider extends ChangeNotifier {
     if (response != null &&
         response['serverUrl'] != null &&
         response['participantToken'] != null) {
-      if (await _service.isRoomActive(response['roomName'])) {}
+      //if (await _service.isRoomActive(response['roomName'])) {}
       _url = response['serverUrl'];
       _token = response['participantToken'];
       _paticipantName = response['participantName'];

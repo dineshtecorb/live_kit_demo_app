@@ -1,23 +1,22 @@
 PODS:
   - connectivity_plus (0.0.1):
     - Flutter
-    - ReachabilitySwift
   - device_info_plus (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - flutter_webrtc (0.9.36):
+  - flutter_webrtc (1.0.0):
     - Flutter
-    - WebRTC-SDK (= 114.5735.08)
-  - livekit_client (1.5.6):
+    - WebRTC-SDK (= 137.7151.02)
+  - livekit_client (2.5.0):
     - Flutter
-    - WebRTC-SDK (= 114.5735.08)
+    - flutter_webrtc
+    - WebRTC-SDK (= 137.7151.02)
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
-  - ReachabilitySwift (5.2.4)
-  - WebRTC-SDK (114.5735.08)
+  - WebRTC-SDK (137.7151.02)
 
 DEPENDENCIES:
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
@@ -30,7 +29,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - ReachabilitySwift
     - WebRTC-SDK
 
 EXTERNAL SOURCES:
@@ -50,16 +48,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
 
 SPEC CHECKSUMS:
-  connectivity_plus: bf0076dd84a130856aa636df1c71ccaff908fa1d
+  connectivity_plus: 2a701ffec2c0ae28a48cf7540e279787e77c447d
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_webrtc: 55df3aaa802114dad390191a46c2c8d535751268
-  livekit_client: 381ed3cad6ba0b6ffbfffcf1b5db95ad1e61ffa2
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_webrtc: 650df6cdb619eb2258592215152764a2f7ada422
+  livekit_client: 013f2c1e5907da50c7eba72fe1e9d7f6dc5bbe96
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
-  ReachabilitySwift: 32793e867593cfc1177f5d16491e3a197d2fccda
-  WebRTC-SDK: c24d2a6c9f571f2ed42297cb8ffba9557093142b
+  WebRTC-SDK: d20de357dcbf7c9696b124b39f3ff62125107e4b
 
-PODFILE CHECKSUM: 4fd6ce810040a6c64af107285ae965db5e8ecd0b
+PODFILE CHECKSUM: 58fd9563e134e3f283a4d19d3b11dc2d3204d442
 
 COCOAPODS: 1.16.2

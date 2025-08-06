@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:live_kit_demo/livekit_provider.dart';
-import 'package:live_kit_demo/livekit_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -55,7 +54,7 @@ class _LiveKitStartScreenState extends State<LiveKitStartScreen> {
   @override
   void initState() {
     super.initState();
-    _checkPermissions();
+    // _checkPermissions();
   }
 
   @override
@@ -68,34 +67,91 @@ class _LiveKitStartScreenState extends State<LiveKitStartScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Instructions for testing
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: const Column(
+                children: [
+                  Text(
+                    'To test with two devices:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    '• Use the SAME room name on both devices\n'
+                    '• Use DIFFERENT participant names\n'
+                    '• Click "Join Room" on both devices',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
             TextField(
               controller: _participantNameController,
-              decoration: const InputDecoration(labelText: 'Participant Name'),
+              decoration: const InputDecoration(
+                labelText: 'Your Name',
+                hintText: 'Enter your name (e.g., John, Alice)',
+                border: OutlineInputBorder(),
+              ),
             ),
+            const SizedBox(height: 12),
             TextField(
               controller: _roomNameController,
-              decoration: const InputDecoration(labelText: 'Room Name'),
+              decoration: const InputDecoration(
+                labelText: 'Room Name',
+                hintText: 'Enter room name (e.g., meeting-123)',
+                border: OutlineInputBorder(),
+              ),
             ),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                /*Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LiveKitHomePage()));*/
                 if (_participantNameController.text.isEmpty ||
                     _roomNameController.text.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content:
-                          Text('Please enter a participant name and room name'),
+                          Text('Please enter both your name and room name'),
+                      backgroundColor: Colors.red,
                     ),
                   );
                   return;
                 }
-                provider.generateTokenAndUrlWith(context,
-                    _participantNameController.text, _roomNameController.text);
+
+                // Show loading indicator
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        const SizedBox(width: 12),
+                        Text('Joining room: ${_roomNameController.text}'),
+                      ],
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+
+                provider.generateTokenAndUrlWith(
+                  context,
+                  _participantNameController.text,
+                  _roomNameController.text,
+                );
               },
-              child: const Text('Start'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text('Join Room'),
             ),
           ],
         ),

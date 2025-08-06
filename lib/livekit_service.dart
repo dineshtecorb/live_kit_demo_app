@@ -11,13 +11,20 @@ class LiveKitService {
   final roomOptions = const RoomOptions(
     adaptiveStream: true,
     dynacast: true,
+    defaultAudioCaptureOptions: AudioCaptureOptions(),
+    defaultVideoPublishOptions: VideoPublishOptions(),
     // WebRTC configuration is handled internally by LiveKit
   );
 
   Future<void> connect(String url, String token) async {
     try {
       _room = Room();
-      await _room?.connect(url, token);
+      _room?.addListener(() {
+        debugPrint('Room connection state: ${_room?.connectionState}');
+      });
+
+      await _room?.connect(url, token,
+          roomOptions: roomOptions, connectOptions: const ConnectOptions());
 
       // Enable audio and video after successful connection
       try {
@@ -113,26 +120,70 @@ class LiveKitService {
   }
 
   // Add more methods for publishing, subscribing, muting, etc. as needed
-  Future<dynamic> generateTokenAndUrlWith(
+  /*Future<dynamic> generateTokenAndUrlWith(
       String paticipantName, String roomName) async {
+    Map<String, String> jsonObject = {
+      'roomName': roomName,
+      'participantName': paticipantName,
+    };
     try {
       final response = await http.post(
         Uri.parse(
             'https://cloud-api.livekit.io/api/sandbox/connection-details'),
         headers: {
-          'X-Sandbox-ID':
-              'tecorblivekitserver-1xky67', //'viveklivekit-1rg10o' //
+          //'content-type': 'application/json', //'viveklivekit-1rg10o' //
+          'X-Sandbox-ID': 'viveklivekit-1rg10o',
         },
-        body: {
-          'participantName': paticipantName,
-          'roomName': roomName,
-        },
+        body: jsonEncode(jsonObject),
       );
       return jsonDecode(response.body);
     } catch (e) {
       if (kDebugMode) {
         print('Error generating token and url: $e');
       }
+    }
+  }*/
+
+  Future<dynamic> generateTokenAndUrlWith(
+    String participantName,
+    String roomName,
+  ) async {
+    final Map<String, String> requestBody = {
+      'roomName': roomName,
+      'participantName': participantName,
+    };
+    final Map<String, String> header = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept': 'application/json',
+      'X-Sandbox-ID': 'viveklivekit-1rg10o',
+    };
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://cloud-api.livekit.io/api/sandbox/connection-details'),
+        headers: header,
+        body: requestBody,
+      );
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        if (kDebugMode) {
+          print("Token generated: $json");
+        }
+
+        // Override the random participant name with the one user provided
+        // json['participantName'] = participantName;
+        // json['roomName'] = roomName;
+
+        return json;
+      } else {
+        throw Exception(
+            'Failed to generate token: ${response.statusCode} ${response.body}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error generating token and URL: $e');
+      }
+      rethrow;
     }
   }
 
